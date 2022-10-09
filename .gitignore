@@ -1,0 +1,13 @@
+run*_*/
+raceline_tracking_with_cbf/
+center_line_tracking/
+raceline_tracking_without_cbf/
+global_racetrajectory_opti*/
+controller_output/
+carla/
+saved_models*/
+Videos/
+*.mp4
+*.pdf
+*.png
+*.ckpt
