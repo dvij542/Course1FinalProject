@@ -24,6 +24,7 @@ import argparse
 import logging
 import time
 import math
+from turtle import speed
 import numpy as np
 import csv
 import matplotlib.pyplot as plt
@@ -53,7 +54,7 @@ from torch.utils.data import DataLoader, Dataset
 
 WIDTH = 800
 HEIGHT = 600
-RUN_NO = 1
+RUN_NO = 0
 N_ITERS = 4
 BETA = 0.1
 SAFEGUARD = True
@@ -186,7 +187,7 @@ def get_optimal_control(steer_ref,steer_var,v,theta,theta_var,x,x_var,curvature,
     min_steer = -MAX_STEER
     min_cost = 1000000
     steer_var = 1
-    if VEHICLE_MODEL=='kinematic' :
+    if VEHICLE_MODEL=='Kinematic' :
         for steer in np.arange(-MAX_STEER,MAX_STEER,0.01) :
             ax = 0
             h_left = LANE_WIDTH/2. - x
@@ -583,97 +584,100 @@ def exec_waypoint_nav_demo(args):
         speed_history = [0]
         steerings_list = [0]
         throttles_list = [0]
-        #############################################
-        # Vehicle Trajectory Live Plotting Setup
-        #############################################
-        # Uses the live plotter to generate live feedback during the simulation
-        # The two feedback includes the trajectory feedback and
-        # the controller feedback (which includes the speed tracking).
-        # lp_traj = lv.LivePlotter(tk_title="Trajectory Trace")
-        # lp_1d = lv.LivePlotter(tk_title="Controls Feedback")
         
-        ###
-        # Add 2D position / trajectory plot
-        ###
-        # trajectory_fig = lp_traj.plot_new_dynamic_2d_figure(
-                # title='Vehicle Trajectory',
-                # figsize=(FIGSIZE_X_INCHES, FIGSIZE_Y_INCHES),
-                # edgecolor="black",
-                # rect=[PLOT_LEFT, PLOT_BOT, PLOT_WIDTH, PLOT_HEIGHT])
+        if True :
+            #############################################
+            # Vehicle Trajectory Live Plotting Setup
+            #############################################
+            # Uses the live plotter to generate live feedback during the simulation
+            # The two feedback includes the trajectory feedback and
+            # the controller feedback (which includes the speed tracking).
+            # lp_traj = lv.LivePlotter(tk_title="Trajectory Trace")
+            # lp_1d = lv.LivePlotter(tk_title="Controls Feedback")
+            
+            ###
+            # Add 2D position / trajectory plot
+            ###
+            # trajectory_fig = lp_traj.plot_new_dynamic_2d_figure(
+                    # title='Vehicle Trajectory',
+                    # figsize=(FIGSIZE_X_INCHES, FIGSIZE_Y_INCHES),
+                    # edgecolor="black",
+                    # rect=[PLOT_LEFT, PLOT_BOT, PLOT_WIDTH, PLOT_HEIGHT])
 
-        # trajectory_fig.set_invert_x_axis() # Because UE4 uses left-handed 
-        #                                    # coordinate system the X
-        #                                    # axis in the graph is flipped
-        # trajectory_fig.set_axis_equal()    # X-Y spacing should be equal in size
+            # trajectory_fig.set_invert_x_axis() # Because UE4 uses left-handed 
+            #                                    # coordinate system the X
+            #                                    # axis in the graph is flipped
+            # trajectory_fig.set_axis_equal()    # X-Y spacing should be equal in size
 
-        # # Add waypoint markers
-        # trajectory_fig.add_graph("waypoints", window_size=waypoints_np.shape[0],
-        #                          x0=waypoints_np[:,0], y0=waypoints_np[:,1],
-        #                          linestyle="-", marker="", color='g')
-        # # Add trajectory markers
-        # trajectory_fig.add_graph("trajectory", window_size=TOTAL_EPISODE_FRAMES,
-        #                          x0=[start_x]*TOTAL_EPISODE_FRAMES, 
-        #                          y0=[start_y]*TOTAL_EPISODE_FRAMES,
-        #                          color=[1, 0.5, 0])
-        # # Add lookahead path
-        # trajectory_fig.add_graph("lookahead_path", 
-        #                          window_size=INTERP_MAX_POINTS_PLOT,
-        #                          x0=[start_x]*INTERP_MAX_POINTS_PLOT, 
-        #                          y0=[start_y]*INTERP_MAX_POINTS_PLOT,
-        #                          color=[0, 0.7, 0.7],
-        #                          linewidth=4)
-        # # Add starting position marker
-        # trajectory_fig.add_graph("start_pos", window_size=1, 
-        #                          x0=[start_x], y0=[start_y],
-        #                          marker=11, color=[1, 0.5, 0], 
-        #                          markertext="Start", marker_text_offset=1)
-        # # Add end position marker
-        # trajectory_fig.add_graph("end_pos", window_size=1, 
-        #                          x0=[waypoints_np[-1, 0]], 
-        #                          y0=[waypoints_np[-1, 1]],
-        #                          marker="D", color='r', 
-        #                          markertext="End", marker_text_offset=1)
-        # # Add car marker
-        # trajectory_fig.add_graph("car", window_size=1, 
-        #                          marker="s", color='b', markertext="Car",
-        #                          marker_text_offset=1)
+            # # Add waypoint markers
+            # trajectory_fig.add_graph("waypoints", window_size=waypoints_np.shape[0],
+            #                          x0=waypoints_np[:,0], y0=waypoints_np[:,1],
+            #                          linestyle="-", marker="", color='g')
+            # # Add trajectory markers
+            # trajectory_fig.add_graph("trajectory", window_size=TOTAL_EPISODE_FRAMES,
+            #                          x0=[start_x]*TOTAL_EPISODE_FRAMES, 
+            #                          y0=[start_y]*TOTAL_EPISODE_FRAMES,
+            #                          color=[1, 0.5, 0])
+            # # Add lookahead path
+            # trajectory_fig.add_graph("lookahead_path", 
+            #                          window_size=INTERP_MAX_POINTS_PLOT,
+            #                          x0=[start_x]*INTERP_MAX_POINTS_PLOT, 
+            #                          y0=[start_y]*INTERP_MAX_POINTS_PLOT,
+            #                          color=[0, 0.7, 0.7],
+            #                          linewidth=4)
+            # # Add starting position marker
+            # trajectory_fig.add_graph("start_pos", window_size=1, 
+            #                          x0=[start_x], y0=[start_y],
+            #                          marker=11, color=[1, 0.5, 0], 
+            #                          markertext="Start", marker_text_offset=1)
+            # # Add end position marker
+            # trajectory_fig.add_graph("end_pos", window_size=1, 
+            #                          x0=[waypoints_np[-1, 0]], 
+            #                          y0=[waypoints_np[-1, 1]],
+            #                          marker="D", color='r', 
+            #                          markertext="End", marker_text_offset=1)
+            # # Add car marker
+            # trajectory_fig.add_graph("car", window_size=1, 
+            #                          marker="s", color='b', markertext="Car",
+            #                          marker_text_offset=1)
 
-        ###
-        # Add 1D speed profile updater
-        ###
-        # forward_speed_fig =\
-        #         lp_1d.plot_new_dynamic_figure(title="Forward Speed (m/s)")
-        # forward_speed_fig.add_graph("forward_speed", 
-        #                             label="forward_speed", 
-        #                             window_size=TOTAL_EPISODE_FRAMES)
-        # forward_speed_fig.add_graph("reference_signal", 
-        #                             label="reference_Signal", 
-        #                             window_size=TOTAL_EPISODE_FRAMES)
+            ###
+            # Add 1D speed profile updater
+            ###
+            # forward_speed_fig =\
+            #         lp_1d.plot_new_dynamic_figure(title="Forward Speed (m/s)")
+            # forward_speed_fig.add_graph("forward_speed", 
+            #                             label="forward_speed", 
+            #                             window_size=TOTAL_EPISODE_FRAMES)
+            # forward_speed_fig.add_graph("reference_signal", 
+            #                             label="reference_Signal", 
+            #                             window_size=TOTAL_EPISODE_FRAMES)
 
-        # # Add throttle signals graph
-        # throttle_fig = lp_1d.plot_new_dynamic_figure(title="Throttle")
-        # throttle_fig.add_graph("throttle", 
-        #                       label="throttle", 
-        #                       window_size=TOTAL_EPISODE_FRAMES)
-        # # Add brake signals graph
-        # brake_fig = lp_1d.plot_new_dynamic_figure(title="Brake")
-        # brake_fig.add_graph("brake", 
-        #                       label="brake", 
-        #                       window_size=TOTAL_EPISODE_FRAMES)
-        # # Add steering signals graph
-        # steer_fig = lp_1d.plot_new_dynamic_figure(title="Steer")
-        # steer_fig.add_graph("steer", 
-        #                       label="steer", 
-        #                       window_size=TOTAL_EPISODE_FRAMES)
+            # # Add throttle signals graph
+            # throttle_fig = lp_1d.plot_new_dynamic_figure(title="Throttle")
+            # throttle_fig.add_graph("throttle", 
+            #                       label="throttle", 
+            #                       window_size=TOTAL_EPISODE_FRAMES)
+            # # Add brake signals graph
+            # brake_fig = lp_1d.plot_new_dynamic_figure(title="Brake")
+            # brake_fig.add_graph("brake", 
+            #                       label="brake", 
+            #                       window_size=TOTAL_EPISODE_FRAMES)
+            # # Add steering signals graph
+            # steer_fig = lp_1d.plot_new_dynamic_figure(title="Steer")
+            # steer_fig.add_graph("steer", 
+            #                       label="steer", 
+            #                       window_size=TOTAL_EPISODE_FRAMES)
 
-        # live plotter is disabled, hide windows
-        # if not enable_live_plot:
-        #     lp_traj._root.withdraw()
-        #     lp_1d._root.withdraw()        
+            # live plotter is disabled, hide windows
+            # if not enable_live_plot:
+            #     lp_traj._root.withdraw()
+            #     lp_1d._root.withdraw()        
 
-        # Iterate the frames until the end of the waypoints is reached or
-        # the TOTAL_EPISODE_FRAMES is reached. The controller simulation then
-        # ouptuts the results to the controller output directory.
+            # Iterate the frames until the end of the waypoints is reached or
+            # the TOTAL_EPISODE_FRAMES is reached. The controller simulation then
+            # ouptuts the results to the controller output directory.
+            haha = True
         reached_the_end = False
         skip_first_frame = True
         closest_index    = 0  # Index of waypoint that is currently closest to
@@ -684,12 +688,20 @@ def exec_waypoint_nav_demo(args):
         cmd_steer = 0
         cmd_steer1 = 0
         cmd_throttle = 0
-        model = EndtoEnd()
-        in_features = model.fc.in_features
-        model.fc = nn.Sequential(nn.Dropout(0.2),nn.Linear(in_features, 128))
-        model = model.cuda()
-        model.eval()
-        model.fc.train()
+        if VEHICLE_MODEL=='Kinematic' :
+            model = models.resnet18()
+            in_features = model.fc.in_features
+            model.fc = nn.Sequential(nn.Dropout(0.2),nn.Linear(in_features, 1))
+            model = model.cuda()
+            model.eval()
+            model.fc.train()
+        else :
+            model = EndtoEnd()
+            in_features = model.fc.in_features
+            model.fc = nn.Sequential(nn.Dropout(0.2),nn.Linear(in_features, 128))
+            model = model.cuda()
+            model.eval()
+            model.fc.train()
 
         model_safety_1 = models.resnet18()
         model_safety_1.fc = nn.Sequential(nn.Dropout(0.2),nn.Linear(in_features, 1))
@@ -765,6 +777,7 @@ def exec_waypoint_nav_demo(args):
             current_speed = measurement_data.player_measurements.forward_speed
             current_speed_perp = vel_y_num*math.cos(current_yaw) - vel_x_num*math.sin(current_yaw)
             current_omega = (current_yaw-prev_yaw)/(float(measurement_data.game_timestamp) / 1000.0 - current_timestamp)
+            print("Numericals : ", current_speed_perp,current_omega)
             current_timestamp = float(measurement_data.game_timestamp) / 1000.0
 
             # Wait for some initial time before starting the demo
@@ -792,15 +805,22 @@ def exec_waypoint_nav_demo(args):
                 im = Image.fromarray(img_array)
                 # print(transform(im).shape)
                 steer_to_save = int(100*cmd_steer*180./3.14)
-                # if frame//5 > 150 :
-                #     im.save('run'+str(RUN_NO)+'_images/frame_'+str(frame//5)+'_'+str(steer_to_save)+'_'+str(int(10000*curvature_save))+'_'+str(int(100*x_save))+'_'+str(int(100*theta_save*180./3.14))+'.png')
+                if frame//5 > 150 :
+                    im.save('run'+str(RUN_NO)+'_images/frame_'+str(frame//5)+'_'+str(steer_to_save)+\
+                        '_'+str(int(10000*curvature_save))+'_'+str(int(100*x_save))+'_'+\
+                        str(int(100*theta_save*180./3.14))+'_'+str(int(100*current_speed))+\
+                        '_'+str(int(100*current_speed_perp))+'.png')
                 # im = Image.open('run'+str(RUN_NO)+'_images/frame_'+str(frame//5)+'_'+str(steer_to_save)+'_'+str(int(10000*curvature_save))+'_'+str(int(100*x_save))+'_'+str(int(100*theta_save*180./3.14))+'.png')
                 inp = torch.unsqueeze(transform(im),0).cuda()
                 # print(inp.shape)
                 preds = []
                 mean = 0
                 for i in range(N_ITERS) :
-                    preds.append(float(model(inp)[0].cpu()))
+                    if VEHICLE_MODEL=='Kinematic' :
+                        preds.append(float(model(inp)[0].cpu()))
+                    else :
+                        preds.append(float(model(inp,torch.tensor([[current_speed]]).cuda()\
+                            ,torch.tensor([[current_speed_perp]]).cuda())[0].cpu()))
                     mean += preds[i]
                 cmd_steer1 = mean/N_ITERS
                 var = 0
@@ -960,7 +980,7 @@ def exec_waypoint_nav_demo(args):
             controller.update_waypoints(new_waypoints)
 
             # Update the other controller values and controls
-            if VEHICLE_MODEL=='kinematic' :
+            if VEHICLE_MODEL=='Kinematic' :
                 controller.update_values(current_x, current_y, current_yaw, 
                                         current_speed,
                                         current_timestamp, frame)
@@ -976,11 +996,14 @@ def exec_waypoint_nav_demo(args):
             val = vec2[0]*vec1[1] - vec2[1]*vec1[0]
             x_save = closest_distance*val/abs(val)
             theta_save = rel_angle
-            curvature_save = computeCurvature(centerline_np[closest_index_centre,:],centerline_np[closest_index_centre+2,:],centerline_np[closest_index_centre+4,:])
+            curvature_save = computeCurvature(centerline_np[closest_index_centre,:],\
+                centerline_np[closest_index_centre+2,:],centerline_np[closest_index_centre+4,:])
             
             
             
-            cmd_steer_updated = get_optimal_control(cmd_steer1, steer_var , current_speed, theta, theta_var, x, x_var, curvature, curvature_var)
+            cmd_steer_updated = get_optimal_control(cmd_steer1, steer_var , current_speed, \
+                theta, theta_var, x, x_var, curvature, curvature_var, \
+                v_perp=current_speed_perp,omega=current_omega)
             # print("Updated : ", cmd_steer_updated)
             # Skip the first frame (so the controller has proper outputs)
             if skip_first_frame and frame == 0:

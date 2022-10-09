@@ -51,7 +51,7 @@ class Controller2D(object):
             desired_speed = self._waypoints[min_idx][2]
         else:
             desired_speed = self._waypoints[-1][2]
-        self._desired_speed = desired_speed
+        self._desired_speed = desired_speed*1.3
 
     def update_waypoints(self, new_waypoints):
         self._waypoints = new_waypoints

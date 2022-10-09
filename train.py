@@ -58,6 +58,7 @@ class EndtoEnd(models.resnet.ResNet):
         # change forward here
         # print(vperp.shape)
         speed_feat = torch.cat([torch.atan2(vperp,v),torch.sqrt(v**2+vperp**2)],dim=1)
+        print(speed_feat)
         # print(speed_feat.shape)
         x1 = super(EndtoEnd,self).forward(x)
         # print(x1.shape)
@@ -66,6 +67,7 @@ class EndtoEnd(models.resnet.ResNet):
         x = torch.cat((x1,x2),axis=1)
         # print(x.shape)
         x = self.final_layer(x)
+        print(x)
         return x
 
 class croppedDataset(Dataset):
@@ -95,7 +97,7 @@ class croppedDataset(Dataset):
         x = float(Y[4])/100.
         theta = float(Y[5])/100.
         # print(Y)
-        v = 0#float(Y[6])/100.
+        v = 5#float(Y[6])/100.
         vperp = 0#float(Y[7])/100.
         # print(curvature)
         Y1 = torch.tensor([steering])
@@ -200,7 +202,9 @@ def main(args):
             
             # Forward, backward and optimize
             if TRAIN_STEERING :
+                # print(Y2[:,4:5],Y2[:,5:])
                 outputs = model(images,Y2[:,4:5],Y2[:,5:])
+                print(steerings)
                 loss = criterion(outputs, steerings)
                 model.zero_grad()
                 loss.backward()
